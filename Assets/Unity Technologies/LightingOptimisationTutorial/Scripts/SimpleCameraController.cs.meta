@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 835dcd0d52d3849aaa08dfb113e167d5
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 73563
+  packageName: Lighting Optimisation Tutorial
+  packageVersion: 1.5.0
+  assetPath: Assets/Unity Technologies/LightingOptimisationTutorial/Scripts/SimpleCameraController.cs
+  uploadId: 506754
