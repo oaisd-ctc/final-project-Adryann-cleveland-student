@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 451e03c56eb227f4eb8e0f06572d2f3b
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 225476
+  packageName: Mainz Gladius
+  packageVersion: 1.0
+  assetPath: Assets/Gladius/Demo Scene/Materials/Unity Materials/Wall Back.mat
+  uploadId: 545952

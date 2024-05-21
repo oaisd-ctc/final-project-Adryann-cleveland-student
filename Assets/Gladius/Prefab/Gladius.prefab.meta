@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 52d39069457eb4c459eee94c3936cc78
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 225476
+  packageName: Mainz Gladius
+  packageVersion: 1.0
+  assetPath: Assets/Gladius/Prefab/Gladius.prefab
+  uploadId: 545952
