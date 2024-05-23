@@ -8,6 +8,9 @@ onBoardingDoNotAskAgain = true
 showPackageIndexes = false
 showStatusBar = false
 scopes = {
+	"last_search.8DF93126" = "render settings"
+	"OpenInspectorPreview.8DF93126" = "0"
+	"currentGroup.8DF93126" = "settings"
 }
 providers = {
 	log = {
@@ -58,6 +61,26 @@ providers = {
 	presets_provider = {
 		active = false
 		priority = -10
+		defaultAction = null
+	}
+	menu = {
+		active = true
+		priority = 80
+		defaultAction = null
+	}
+	settings = {
+		active = true
+		priority = 100
+		defaultAction = null
+	}
+	calculator = {
+		active = true
+		priority = 10
+		defaultAction = null
+	}
+	static_methods = {
+		active = true
+		priority = 85
 		defaultAction = null
 	}
 }
