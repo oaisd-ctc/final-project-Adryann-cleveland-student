@@ -1,116 +1,105 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.SceneManagement;
 
-public class EnemyAiTutorial : MonoBehaviour
+public class EnemyAI : MonoBehaviour
 {
-    public NavMeshAgent agent;
-
+    public NavMeshAgent ai;
+    public List<Transform> destinations;
+    public Animator aiAnim;
+    public float walkSpeed, chaseSpeed, minIdleTime, maxIdleTime, idleTime, sightDistance, catchDistance, chaseTime, minChaseTime, maxChaseTime, jumpscareTime;
+    public bool walking, chasing;
     public Transform player;
+    Transform currentDest;
+    Vector3 dest;
+    int randNum;
+    public int destinationAmount;
+    public Vector3 rayCastOffset;
+    public string deathScene;
 
-    public LayerMask whatIsGround, whatIsPlayer;
-
-    public float health;
-
-    //Patroling
-    public Vector3 walkPoint;
-    bool walkPointSet;
-    public float walkPointRange;
-
-    //Attacking
-    public float timeBetweenAttacks;
-    bool alreadyAttacked;
-    public GameObject projectile;
-
-    //States
-    public float sightRange, attackRange;
-    public bool playerInSightRange, playerInAttackRange;
-
-    private void Awake()
+    void Start()
     {
-        Transform transform1 = GameObject.Find("PlayerObj").transform;
-        player = transform1;
-        agent = GetComponent<NavMeshAgent>();
+        walking = true;
+        randNum = Random.Range(0, destinations.Count);
+        currentDest = destinations[randNum];
     }
-
-    private void Update()
+    void Update()
     {
-        //Check for sight and attack range
-        playerInSightRange = Physics.CheckSphere(transform.position, sightRange, whatIsPlayer);
-        playerInAttackRange = Physics.CheckSphere(transform.position, attackRange, whatIsPlayer);
-
-        if (!playerInSightRange && !playerInAttackRange) Patroling();
-        if (playerInSightRange && !playerInAttackRange) ChasePlayer();
-        if (playerInAttackRange && playerInSightRange) AttackPlayer();
-    }
-
-    private void Patroling()
-    {
-        if (!walkPointSet) SearchWalkPoint();
-
-        if (walkPointSet)
-            agent.SetDestination(walkPoint);
-
-        Vector3 distanceToWalkPoint = transform.position - walkPoint;
-
-        //Walkpoint reached
-        if (distanceToWalkPoint.magnitude < 1f)
-            walkPointSet = false;
-    }
-    private void SearchWalkPoint()
-    {
-        //Calculate random point in range
-        float randomZ = Random.Range(-walkPointRange, walkPointRange);
-        float randomX = Random.Range(-walkPointRange, walkPointRange);
-
-        walkPoint = new Vector3(transform.position.x + randomX, transform.position.y, transform.position.z + randomZ);
-
-        if (Physics.Raycast(walkPoint, -transform.up, 2f, whatIsGround))
-            walkPointSet = true;
-    }
-
-    private void ChasePlayer()
-    {
-        agent.SetDestination(player.position);
-    }
-
-    private void AttackPlayer()
-    {
-        //Make sure enemy doesn't move
-        agent.SetDestination(transform.position);
-
-        transform.LookAt(player);
-
-        if (!alreadyAttacked)
+        Vector3 direction = (player.position - transform.position).normalized;
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position + rayCastOffset, direction, out hit, sightDistance))
         {
-            ///Attack code here
-
-            ///End of attack code
-
-            alreadyAttacked = true;
-            Invoke(nameof(ResetAttack), timeBetweenAttacks);
+            if (hit.collider.gameObject.tag == "Player")
+            {
+                walking = false;
+                StopCoroutine("stayIdle");
+                StopCoroutine("chaseRoutine");
+                StartCoroutine("chaseRoutine");
+                chasing = true;
+            }
+        }
+        if (chasing == true)
+        {
+            dest = player.position;
+            ai.destination = dest;
+            ai.speed = chaseSpeed;
+            aiAnim.ResetTrigger("walk");
+            aiAnim.ResetTrigger("idle");
+            aiAnim.SetTrigger("sprint");
+            float distance = Vector3.Distance(player.position, ai.transform.position);
+            if (distance <= catchDistance)
+            {
+                player.gameObject.SetActive(false);
+                aiAnim.ResetTrigger("walk");
+                aiAnim.ResetTrigger("idle");
+                aiAnim.ResetTrigger("sprint");
+                aiAnim.SetTrigger("jumpscare");
+                StartCoroutine(deathRoutine());
+                chasing = false;
+            }
+        }
+        if (walking == true)
+        {
+            dest = currentDest.position;
+            ai.destination = dest;
+            ai.speed = walkSpeed;
+            aiAnim.ResetTrigger("sprint");
+            aiAnim.ResetTrigger("idle");
+            aiAnim.SetTrigger("walk");
+            if (ai.remainingDistance <= ai.stoppingDistance)
+            {
+                aiAnim.ResetTrigger("sprint");
+                aiAnim.ResetTrigger("walk");
+                aiAnim.SetTrigger("idle");
+                ai.speed = 0;
+                StopCoroutine("stayIdle");
+                StartCoroutine("stayIdle");
+                walking = false;
+            }
         }
     }
-    private void ResetAttack()
+    IEnumerator stayIdle()
     {
-        alreadyAttacked = false;
+        idleTime = Random.Range(minIdleTime, maxIdleTime);
+        yield return new WaitForSeconds(idleTime);
+        walking = true;
+        randNum = Random.Range(0, destinations.Count);
+        currentDest = destinations[randNum];
     }
-
-    public void TakeDamage(int damage)
+    IEnumerator chaseRoutine()
     {
-        health -= damage;
-
-        if (health <= 0) Invoke(nameof(DestroyEnemy), 0.5f);
+        chaseTime = Random.Range(minChaseTime, maxChaseTime);
+        yield return new WaitForSeconds(chaseTime);
+        walking = true;
+        chasing = false;
+        randNum = Random.Range(0, destinations.Count);
+        currentDest = destinations[randNum];
     }
-    private void DestroyEnemy()
+    IEnumerator deathRoutine()
     {
-        Destroy(gameObject);
-    }
-
-    private void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, attackRange);
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, sightRange);
+        yield return new WaitForSeconds(jumpscareTime);
+        SceneManager.LoadScene(deathScene);
     }
 }
