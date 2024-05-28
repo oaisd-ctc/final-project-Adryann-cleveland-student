@@ -24,6 +24,8 @@ public class Climbing : MonoBehaviour
     public int climbJumps;
     private int climbJumpsLeft;
 
+    public Animator ani;
+
     [Header("Exiting")]
     public bool extitingWall;
     public float exitWallTime;
@@ -115,6 +117,7 @@ public class Climbing : MonoBehaviour
     private void ClimbJump()
 
     {
+      
         extitingWall = true;
         exitWallTimer = exitWallTime;
 

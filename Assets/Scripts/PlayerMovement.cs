@@ -16,15 +16,18 @@ public class PlayerMovement : MonoBehaviour
         climbing,
         crouching,
         sliding,
+        Idle,
+        Attacking,
     }
 
     public bool sliding;
-
+    public bool Idle;
     public bool freeze;
     public bool unlimited;
     public bool climbing;
     public bool restricted;
 
+   public Animator ani;
 
 
     [Header("References")]
@@ -53,6 +56,11 @@ public class PlayerMovement : MonoBehaviour
     public KeyCode jumpKey = KeyCode.Space;
     public KeyCode sprintKey = KeyCode.LeftShift;
     public KeyCode crouchKey = KeyCode.LeftControl;
+    public KeyCode Walk = KeyCode.W;
+    public KeyCode Right = KeyCode.D;
+    public KeyCode Left = KeyCode.A;
+    public KeyCode Back = KeyCode.S;
+
 
     [Header("Ground Check")]
     public float playerHeight;
@@ -73,18 +81,24 @@ public class PlayerMovement : MonoBehaviour
     Vector3 moveDirection;
     public Rigidbody rb;
 
+    BoxCollider blade;
+    
+    public EnemyHealth enemy;
+    public KeyCode attack = KeyCode.Q;
+   
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true;
 
         startYScale = transform.localScale.y;
-
+       // ani.SetTrigger("Idle");
     }
 
     private void Update()
     {
-
+   
+      
         //ground check
 
         grounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.2f, whatIsGround);
@@ -97,10 +111,12 @@ public class PlayerMovement : MonoBehaviour
             rb.drag = groundDrag;
         else
             rb.drag = 0;
-
-
+     
+       
 
     }
+   
+  
     private void FixedUpdate()
     {
         MovePlayer();
@@ -119,30 +135,60 @@ public class PlayerMovement : MonoBehaviour
 
         }
 
+        else if (grounded && Input.GetKey(attack))
+        {
+            ani.SetTrigger("Attack");
+            State = MovementState.Attacking;
+            desiredMoveSpeed = 0;
+        }
+
+
         else if (Input.GetKey(crouchKey))
         {
+            //ani.ResetTrigger("playerrunning");
+            ani.SetTrigger("playerWalk");
             State = MovementState.crouching;
             desiredMoveSpeed = crouchSpeed;
         }
         else if (grounded && Input.GetKey(sprintKey))
         {
+            ani.SetTrigger("playerrunning");
             State = MovementState.sprinting;
             desiredMoveSpeed = sprintSpeed;
         }
 
-        else if (grounded)
+        else if (grounded && Input.GetKey(Walk) || Input.GetKey(Right) || Input.GetKey(Left) || Input.GetKey(Back))
         {
+            ani.SetTrigger("playerWalk");
+          //  ani.ResetTrigger("playerrunning");
+           // ani.ResetTrigger("player jump");
             State = MovementState.walking;
             desiredMoveSpeed = walkSpeed;
         }
 
+        
+        else if (grounded)
+        {
+            ani.SetTrigger("Idle");
+            State = MovementState.Idle;
+            desiredMoveSpeed = 0;
+
+
+        }
+      
+
         else
         {
+            ani.SetTrigger("player jump");
+            ani.ResetTrigger("playerrunning");
+            ani.ResetTrigger("Idle");
+            ani.ResetTrigger("playerWalk");
             State = MovementState.air;
         }
 
         if (Mathf.Abs(desiredMoveSpeed - lastDesiredMoveSpeed) > 4f && moveSpeed != 0)
         {
+           
             StopAllCoroutines();
             StartCoroutine(SmoothlyLerpMoveSpeed());
         }
@@ -159,6 +205,7 @@ public class PlayerMovement : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Space) && grounded)
         {
+          
             Vector3 jumpDirection = Vector3.up * jumpFroce;
             rb.AddForce(jumpDirection, ForceMode.VelocityChange);
         }
@@ -194,7 +241,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void MovePlayer()
     {
-
+      
         if (OnSlope() && !exitingSlope)
         {
             rb.AddForce(GetSlopeMoveDirection(moveDirection) * moveSpeed * 20f, ForceMode.Force);
@@ -211,6 +258,7 @@ public class PlayerMovement : MonoBehaviour
         //on ground
         if (grounded)
         {
+            
             rb.AddForce(moveDirection.normalized * moveSpeed * 10f, ForceMode.Force);
         }
 
@@ -258,5 +306,8 @@ public class PlayerMovement : MonoBehaviour
     {
         return Vector3.ProjectOnPlane(direction, slopeHit.normal).normalized;
     }
+ 
+   
+
 }
 

@@ -9,7 +9,19 @@ EditorBuildSettings:
     path: Assets/backup.unity
     guid: 637322c18595bd2409f372d9cf809cb1
   - enabled: 1
-    path: Assets/Start.unity
-    guid: 745a64d68b0fc4e4ba5d3542e658f2ad
+    path: Assets/Level1.unity
+    guid: 60780e4a894444e44b54a10ba2b7b2cd
+  - enabled: 1
+    path: Assets/Level2.unity
+    guid: e1321e305ca05be4880b185b14293af9
+  - enabled: 1
+    path: Assets/level3.unity
+    guid: 18d755feec496004380ba57841064ada
+  - enabled: 1
+    path: Assets/deathscreen.unity
+    guid: 524de2523ee28f54f873ae7cb6fa72c7
+  - enabled: 1
+    path: Assets/StartMenue.unity
+    guid: e0317c996821a3745962b048b54ee659
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0

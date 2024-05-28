@@ -8,7 +8,7 @@ public class EnemyAI : MonoBehaviour
 {
     public NavMeshAgent ai;
     public List<Transform> destinations;
-   // public Animator aiAnim;
+    public Animator aiAnim;
     public float walkSpeed, chaseSpeed, minIdleTime, maxIdleTime, idleTime, sightDistance, catchDistance, chaseTime, minChaseTime, maxChaseTime, jumpscareTime;
     public bool walking, chasing;
     public Transform player;
@@ -19,11 +19,28 @@ public class EnemyAI : MonoBehaviour
     public Vector3 rayCastOffset;
     public string deathScene;
 
+    public float Damage;
+
+    public HealthSystem playerHealth;
+
+    SphereCollider cicle;
     void Start()
     {
+       // playerHealth = GameObject.FindGameObjectWithTag("Player").GetComponent<HealthSystem>();
+       // if(playerHealth == null)
+       // {
+         //   Debug.LogError("Player doesnt have Health");
+//
+       // }
+        //else
+       // {
+         //   Debug.LogError("Player Object not foind");
+       // }
         walking = true;
         randNum = Random.Range(0, destinations.Count);
         currentDest = destinations[randNum];
+        aiAnim = GetComponent<Animator>();
+        cicle = GetComponentInChildren<SphereCollider>();
     }
     void Update()
     {
@@ -47,19 +64,22 @@ public class EnemyAI : MonoBehaviour
             dest = player.position;
             ai.destination = dest;
             ai.speed = chaseSpeed;
-           // aiAnim.ResetTrigger("walk");
-           // aiAnim.ResetTrigger("idle");
-           // aiAnim.SetTrigger("sprint");
+            aiAnim.ResetTrigger("walk");
+            aiAnim.ResetTrigger("Idle");
+           aiAnim.SetTrigger("walk");
             float distance = Vector3.Distance(player.position, ai.transform.position);
             if (distance <= catchDistance)
             {
-                player.gameObject.SetActive(false);
-             //   aiAnim.ResetTrigger("walk");
-             //   aiAnim.ResetTrigger("idle");
-             //   aiAnim.ResetTrigger("sprint");
+                //player.gameObject.SetActive(false);
+                Attack();
+                
+               aiAnim.ResetTrigger("walk");
+               aiAnim.ResetTrigger("Idle");
+                aiAnim.ResetTrigger("walk");
             
                 
-                chasing = false;
+                
+                walking = false;
             }
         }
         if (walking == true)
@@ -68,16 +88,17 @@ public class EnemyAI : MonoBehaviour
             ai.destination = dest;
             ai.speed = walkSpeed;
            // aiAnim.ResetTrigger("sprint");
-           // aiAnim.ResetTrigger("idle");
-           // aiAnim.SetTrigger("walk");
+           aiAnim.ResetTrigger("Idle");
+            aiAnim.SetTrigger("walk");
             if (ai.remainingDistance <= ai.stoppingDistance)
             {
-              //  aiAnim.ResetTrigger("sprint");
-              //  aiAnim.ResetTrigger("walk");
-              //  aiAnim.SetTrigger("idle");
+                aiAnim.ResetTrigger("walk");
+                aiAnim.ResetTrigger("walk");
+                aiAnim.SetTrigger("Idle");
                 ai.speed = 0;
                 StopCoroutine("stayIdle");
                 StartCoroutine("stayIdle");
+                
                 walking = false;
             }
         }
@@ -99,8 +120,33 @@ public class EnemyAI : MonoBehaviour
         randNum = Random.Range(0, destinations.Count);
         currentDest = destinations[randNum];
     }
-  void Attack()
+   void Attack()
     {
-        ai.SetDestination(transform.position);
+        if (!aiAnim.GetCurrentAnimatorStateInfo(0).IsName("Attack1"))
+         {
+            aiAnim.SetTrigger("Attack1");
+            ai.SetDestination(transform.position);
+            HealthSystem.Instance.TakeDamage(Damage);
+        }
+      
+    }
+  void enableAttack()
+    {
+        cicle.enabled = true;
+    }
+
+    void disableAttack()
+    {
+        cicle.enabled = false;
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        var player = other.GetComponent<PlayerMovement>();
+        if(player != null)
+        {
+          
+            print("HIT");
+        }
     }
 }

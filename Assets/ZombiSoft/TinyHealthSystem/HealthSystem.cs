@@ -11,10 +11,12 @@ using UnityEngine.SceneManagement;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
-
+using UnityEngine.SceneManagement;
 public class HealthSystem : MonoBehaviour
 {
 	public static HealthSystem Instance;
+
+	
 
 	public Image currentHealthBar;
 	public Image currentHealthGlobe;
@@ -47,6 +49,7 @@ public class HealthSystem : MonoBehaviour
 	//==============================================================
   	void Start()
 	{
+		//enemy.GetComponent<EnemyAI>();
 		UpdateGraphics();
 		timeleft = regenUpdateInterval; 
 	}
@@ -167,9 +170,9 @@ public class HealthSystem : MonoBehaviour
 	//==============================================================
 	IEnumerator PlayerDied()
 	{
-		// Player is dead. Do stuff.. play anim, sound..
-		PopupText.Instance.Popup("You have died!", 1f, 1f); // Demo stuff!
-
+		SceneManager.LoadScene(2);
+		Cursor.lockState = CursorLockMode.None;
+		Cursor.visible = true;
 		yield return null;
 	}
 }
