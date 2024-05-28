@@ -7,11 +7,11 @@ public class gameoverscreen : MonoBehaviour
    public void RestartGame()
     {
        
-        SceneManager.LoadSceneAsync(0);
+        SceneManager.LoadSceneAsync(1);
     }
 
     public void MenuScreen()
     {
-        SceneManager.LoadSceneAsync(3);
+        SceneManager.LoadSceneAsync(0);
     }
 }

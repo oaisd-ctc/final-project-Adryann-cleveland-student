@@ -170,7 +170,7 @@ public class HealthSystem : MonoBehaviour
 	//==============================================================
 	IEnumerator PlayerDied()
 	{
-		SceneManager.LoadScene(2);
+		SceneManager.LoadScene(5);
 		Cursor.lockState = CursorLockMode.None;
 		Cursor.visible = true;
 		yield return null;
